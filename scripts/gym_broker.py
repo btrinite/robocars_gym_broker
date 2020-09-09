@@ -17,21 +17,27 @@ from gym_donkeycar.core.sim_client import SDClient
 from robocars_msgs.msg import robocars_radio_channels
 from robocars_msgs.msg import robocars_actuator_output
 
-manual_steering = 0.0
-manual_throttling = 0.0
+steering_order = 0.0
+throttling_order = 0.0
+braking_order = 0.0
 image_pub = {}
 
 bridge = CvBridge()
 
 def throttling_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " throttling %s", str(data.norm))
-   global manual_throttling
-   manual_throttling = data.norm
+   global throttling_order
+   throttling_order = data.norm
 
 def steering_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " steering %s", str(data.norm))
-   global manual_steering
-   manual_steering = -data.norm
+   global steering_order
+   steering_order = -data.norm
+
+def braking_callback(data):
+   #rospy.loginfo(rospy.get_caller_id() + " steering %s", str(data.norm))
+   global braking_order
+   braking_order = -data.norm
 
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
@@ -43,6 +49,7 @@ def initRosNode():
    rospy.init_node('gym_broker', anonymous=True)
    rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback)
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback)
+   rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=10)
    
 class SimpleClient(SDClient):
@@ -136,11 +143,11 @@ class SimpleClient(SDClient):
         time.sleep(0.2)
 
 
-    def send_controls(self, steering, throttle):
+    def send_controls(self, steering, throttle, brake):
         msg = { "msg_type" : "control",
                 "steering" : steering.__str__(),
                 "throttle" : throttle.__str__(),
-                "brake" : "0.0" }
+                "brake" : brake.__str__() }
         self.send(json.dumps(msg))
 
         #this sleep lets the SDClient thread poll our message and send it out.
@@ -148,11 +155,13 @@ class SimpleClient(SDClient):
 
     def update(self):
         # just random steering now
-        global manual_steering
-        global manual_throttling
-        st = manual_steering 
-        th = manual_throttling
-        self.send_controls(st, th)
+        global steering_order
+        global throttling_order
+        global braking_order
+        st = steering_order 
+        th = throttling_order
+        br = braking_order
+        self.send_controls(st, th, br)
 
 def gym_broker():
     logging.basicConfig(level=logging.DEBUG)
