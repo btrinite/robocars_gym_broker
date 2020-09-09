@@ -56,10 +56,22 @@ class SimpleClient(SDClient):
         global image_pub
         if json_packet['msg_type'] == "need_car_config":
             self.send_config()
+            self.send_init()
 
         if json_packet['msg_type'] == "car_loaded":
             self.car_loaded = True
-        
+
+        if json_packet['msg_type'] == "protocol_version":
+            rospy.loginfo(rospy.get_caller_id() + " GYM Protocol Version %s", str(json_packet["version"]))
+
+        if json_packet['msg_type'] == "scene_selection_ready":
+            rospy.loginfo(rospy.get_caller_id() + " Scene Selection Ready")
+            msg = '{ "msg_type" : "get_scene_names" }'
+            self.send_now(msg)
+
+        if json_packet['msg_type'] == "scene_names":
+            rospy.loginfo(rospy.get_caller_id() + " Available Scene(s) %s", str(json_packet["scene_names"]))
+
         if json_packet['msg_type'] == "telemetry":
             imgString = json_packet["image"]
             imgRaw = base64.b64decode(imgString)
@@ -70,6 +82,15 @@ class SimpleClient(SDClient):
                 image_pub.publish(image_message)
 
         #print("got:", json_packet)
+
+    def send_init(self):
+        msg = '{ "msg_type" : "get_protocol_version" }'
+        self.send_now(msg)
+
+        # Load Scene message. Only one client needs to send the load scene.
+        time.sleep(1)
+        msg = '{ "msg_type" : "load_scene", "scene_name" : "road_generator" }'
+        self.send_now(msg)
 
     def send_config(self):
         '''
@@ -145,9 +166,6 @@ def gym_broker():
 
     clients.append(SimpleClient(address=(host, port)))
     time.sleep(1)
-    # Load Scene message. Only one client needs to send the load scene.
-    msg = '{ "msg_type" : "load_scene", "scene_name" : "road_generator" }'
-    clients[0].send_now(msg)
 
     initRosNode()
     # Send random driving controls
