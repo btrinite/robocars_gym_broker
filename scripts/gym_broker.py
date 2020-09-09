@@ -56,7 +56,6 @@ class SimpleClient(SDClient):
         global image_pub
         if json_packet['msg_type'] == "need_car_config":
             self.send_config()
-            self.send_init()
 
         if json_packet['msg_type'] == "car_loaded":
             self.car_loaded = True
@@ -89,7 +88,7 @@ class SimpleClient(SDClient):
 
         # Load Scene message. Only one client needs to send the load scene.
         time.sleep(1)
-        msg = '{ "msg_type" : "load_scene", "scene_name" : "road_generator" }'
+        msg = '{ "msg_type" : "load_scene", "scene_name" : "warehouse" }'
         self.send_now(msg)
 
     def send_config(self):
@@ -166,6 +165,8 @@ def gym_broker():
 
     clients.append(SimpleClient(address=(host, port)))
     time.sleep(1)
+
+    clients[0].send_init()
 
     initRosNode()
     # Send random driving controls
