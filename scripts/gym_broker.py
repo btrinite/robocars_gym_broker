@@ -143,11 +143,11 @@ class SimpleClient(SDClient):
         time.sleep(0.2)
 
 
-    def send_controls(self, steering, throttle, brake):
+    def send_controls(self, steering, throttle):
         msg = { "msg_type" : "control",
                 "steering" : steering.__str__(),
                 "throttle" : throttle.__str__(),
-                "brake" : brake.__str__() }
+                "brake" : "0.0" }
         self.send(json.dumps(msg))
 
         #this sleep lets the SDClient thread poll our message and send it out.
@@ -160,8 +160,9 @@ class SimpleClient(SDClient):
         global braking_order
         st = steering_order 
         th = throttling_order
-        br = braking_order
-        self.send_controls(st, th, br)
+        if (braking_order > 0.2):
+            th = - braking_order
+        self.send_controls(st, th)
 
 def gym_broker():
     logging.basicConfig(level=logging.DEBUG)
