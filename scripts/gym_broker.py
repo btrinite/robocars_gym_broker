@@ -21,7 +21,7 @@ steering_order = 0.0
 throttling_order = 0.0
 braking_order = 0.0
 image_pub = {}
-
+host="localhost"
 bridge = CvBridge()
 
 def throttling_callback(data):
@@ -52,6 +52,13 @@ def initRosNode():
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=10)
    
+def getRosConfig():
+    global host
+    if rospy.has_param('simulatorHost'):
+        rospy.set_param("simulatorHost", "localhost")
+    host = rospy.get_param("simulatorHost")
+
+
 class SimpleClient(SDClient):
 
     def __init__(self, address, poll_socket_sleep_time=0.01):
@@ -171,6 +178,7 @@ class SimpleClient(SDClient):
         self.send_controls(st, th)
 
 def gym_broker():
+    global host
     logging.basicConfig(level=logging.DEBUG)
 
     # test params
@@ -180,6 +188,7 @@ def gym_broker():
     clients = []
 
     initRosNode()
+    getRosConfig()
 
     clients.append(SimpleClient(address=(host, port)))
     time.sleep(1)
