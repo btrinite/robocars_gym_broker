@@ -46,7 +46,7 @@ def initRosNode():
    # name for our 'listener' node so that multiple listeners can
    # run simultaneously.
    global image_pub
-   rospy.init_node('gym_broker')
+   rospy.init_node('gym_broker', anonymous=False)
    rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback)
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback)
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback)
