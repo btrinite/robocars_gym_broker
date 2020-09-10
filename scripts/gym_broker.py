@@ -61,22 +61,35 @@ class SimpleClient(SDClient):
 
     def on_msg_recv(self, json_packet):
         global image_pub
-        if json_packet['msg_type'] == "need_car_config":
-            self.send_config()
+        if (json_packet["msg_type"] != "telemetry"):
+            rospy.loginfo("GYM got message %s", str(json_packet["msg_type"]))
 
         if json_packet['msg_type'] == "car_loaded":
+            rospy.loginfo("car_loaded event received")
             self.car_loaded = True
+            self.send_car_config()
+            self.send_cam_config()
 
         if json_packet['msg_type'] == "protocol_version":
-            rospy.loginfo(rospy.get_caller_id() + " GYM Protocol Version %s", str(json_packet["version"]))
+            rospy.loginfo("GYM Protocol Version %s", str(json_packet["version"]))
 
         if json_packet['msg_type'] == "scene_selection_ready":
-            rospy.loginfo(rospy.get_caller_id() + " Scene Selection Ready")
+            rospy.loginfo("Scene Selection Ready")
             msg = '{ "msg_type" : "get_scene_names" }'
             self.send_now(msg)
+            time.sleep(1)
 
         if json_packet['msg_type'] == "scene_names":
-            rospy.loginfo(rospy.get_caller_id() + " Available Scene(s) %s", str(json_packet["scene_names"]))
+            rospy.loginfo("Available Scene(s) %s", str(json_packet["scene_names"]))
+            # Load Scene message. Only one client needs to send the load scene.
+            msg = '{ "msg_type" : "load_scene", "scene_name" : "warehouse" }'
+            self.send_now(msg)
+            time.sleep(1)
+            
+
+        if json_packet['msg_type'] == "scene_loaded":
+            rospy.loginfo("Scene loaded event")
+            self.send_cam_config()
 
         if json_packet['msg_type'] == "telemetry":
             imgString = json_packet["image"]
@@ -92,13 +105,35 @@ class SimpleClient(SDClient):
     def send_init(self):
         msg = '{ "msg_type" : "get_protocol_version" }'
         self.send_now(msg)
-
-        # Load Scene message. Only one client needs to send the load scene.
         time.sleep(1)
-        msg = '{ "msg_type" : "load_scene", "scene_name" : "warehouse" }'
+
+    def send_cam_config(self):
+        # Camera config
+        # set any field to Zero to get the default camera setting.
+        # this will position the camera right above the car, with max fisheye and wide fov
+        # this also changes the img output to 255x255x1 ( actually 255x255x3 just all three channels have same value)
+        # the offset_x moves camera left/right
+        # the offset_y moves camera up/down
+        # the offset_z moves camera forward/back
+        # with fish_eye_x/y == 0.0 then you get no distortion
+        # img_enc can be one of JPG|PNG|TGA        
+        msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "3", "img_enc" : "JPG", "offset_x" : "0.0", "offset_y" : "1.0", "offset_z" : "3.0", "rot_x" : "75.0" }'
+        self.send_now(msg)
+        time.sleep(0.2)
+
+    def send_car_config(self):
+        # Car config
+        # body_style = "donkey" | "bare" | "car01" choice of string
+        # body_rgb  = (128, 128, 128) tuple of ints
+        car_name = "GrumpyCar"
+
+        msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "0", "body_g" : "255", "body_b" : "0", "car_name" : "%s", "font_size" : "100" }' % (car_name)
         self.send_now(msg)
 
-    def send_config(self):
+        #this sleep gives the car time to spawn. Once it's spawned, it's ready for the camera config.
+        time.sleep(0.2)
+
+    def send_racer_config(self):
         '''
         send three config messages to setup car, racer, and camera
         '''
@@ -118,30 +153,6 @@ class SimpleClient(SDClient):
         self.send_now(json.dumps(msg))
         time.sleep(0.2)
         
-        # Car config
-        # body_style = "donkey" | "bare" | "car01" choice of string
-        # body_rgb  = (128, 128, 128) tuple of ints
-        # car_name = "string less than 64 char"
-
-        msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "255", "body_g" : "0", "body_b" : "255", "car_name" : "%s", "font_size" : "100" }' % (car_name)
-        self.send_now(msg)
-
-        #this sleep gives the car time to spawn. Once it's spawned, it's ready for the camera config.
-        time.sleep(0.2)
-
-        # Camera config
-        # set any field to Zero to get the default camera setting.
-        # this will position the camera right above the car, with max fisheye and wide fov
-        # this also changes the img output to 255x255x1 ( actually 255x255x3 just all three channels have same value)
-        # the offset_x moves camera left/right
-        # the offset_y moves camera up/down
-        # the offset_z moves camera forward/back
-        # with fish_eye_x/y == 0.0 then you get no distortion
-        # img_enc can be one of JPG|PNG|TGA        
-        msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "1.0", "fish_eye_y" : "1.0", "img_w" : "160", "img_h" : "120", "img_d" : "1", "img_enc" : "JPG", "offset_x" : "0.0", "offset_y" : "3.0", "offset_z" : "0.0", "rot_x" : "90.0" }'
-        self.send_now(msg)
-        time.sleep(0.2)
-
 
     def send_controls(self, steering, throttle):
         msg = { "msg_type" : "control",
@@ -175,8 +186,6 @@ def gym_broker():
 
     clients.append(SimpleClient(address=(host, port)))
     time.sleep(1)
-
-    clients[0].send_init()
 
     initRosNode()
     # Send random driving controls
