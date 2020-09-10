@@ -54,7 +54,7 @@ def initRosNode():
    
 def getRosConfig():
     global host
-    if rospy.has_param('simulatorHost'):
+    if rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
     host = rospy.get_param("simulatorHost")
 
