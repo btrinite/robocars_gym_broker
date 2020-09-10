@@ -52,7 +52,7 @@ def initRosNode():
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=10)
    
-def getRosConfig():
+def getConfig():
     global host
     if rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
@@ -182,13 +182,14 @@ def gym_broker():
     logging.basicConfig(level=logging.DEBUG)
 
     # test params
-    host = "FRLA000254-2.local" # "trainmydonkey.com" for virtual racing server
     port = 9091
     num_clients = 1
     clients = []
 
     initRosNode()
-    getRosConfig()
+    getConfig()
+    rospy.loginfo("Will connect to host %s", str(host))
+
 
     clients.append(SimpleClient(address=(host, port)))
     time.sleep(1)
