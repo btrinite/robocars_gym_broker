@@ -46,7 +46,7 @@ def initRosNode():
    # name for our 'listener' node so that multiple listeners can
    # run simultaneously.
    global image_pub
-   rospy.init_node('gym_broker', anonymous=True)
+   rospy.init_node('gym_broker')
    rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback)
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback)
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback)
@@ -188,7 +188,7 @@ def gym_broker():
 
     initRosNode()
     getConfig()
-    rospy.loginfo("Will connect to host %s", str(hostSimulator))
+    rospy.loginfo("Will connect to simulator host %s", str(hostSimulator))
 
 
     clients.append(SimpleClient(address=(hostSimulator, port)))
