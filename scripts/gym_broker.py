@@ -86,11 +86,6 @@ class SimpleClient(SDClient):
             self.send_now(msg)
             time.sleep(1)
             
-
-        if json_packet['msg_type'] == "scene_loaded":
-            rospy.loginfo("Scene loaded event")
-            self.send_cam_config()
-
         if json_packet['msg_type'] == "telemetry":
             imgString = json_packet["image"]
             imgRaw = base64.b64decode(imgString)
@@ -184,10 +179,11 @@ def gym_broker():
     num_clients = 1
     clients = []
 
+    initRosNode()
+
     clients.append(SimpleClient(address=(host, port)))
     time.sleep(1)
 
-    initRosNode()
     # Send random driving controls
     start = time.time()
     do_drive = True
