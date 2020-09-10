@@ -21,7 +21,7 @@ steering_order = 0.0
 throttling_order = 0.0
 braking_order = 0.0
 image_pub = {}
-host="localhost"
+hostSimulator="localhost"
 bridge = CvBridge()
 
 def throttling_callback(data):
@@ -53,7 +53,7 @@ def initRosNode():
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=10)
    
 def getConfig():
-    global host
+    global hostSimulator
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
     hostSimulator = rospy.get_param("simulatorHost")
