@@ -54,9 +54,9 @@ def initRosNode():
    
 def getConfig():
     global host
-    if rospy.has_param("simulatorHost"):
+    if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
-    host = rospy.get_param("simulatorHost")
+    hostSimulator = rospy.get_param("simulatorHost")
 
 
 class SimpleClient(SDClient):
@@ -178,7 +178,7 @@ class SimpleClient(SDClient):
         self.send_controls(st, th)
 
 def gym_broker():
-    global host
+    global hostSimulator
     logging.basicConfig(level=logging.DEBUG)
 
     # test params
@@ -188,10 +188,10 @@ def gym_broker():
 
     initRosNode()
     getConfig()
-    rospy.loginfo("Will connect to host %s", str(host))
+    rospy.loginfo("Will connect to host %s", str(hostSimulator))
 
 
-    clients.append(SimpleClient(address=(host, port)))
+    clients.append(SimpleClient(address=(hostSimulator, port)))
     time.sleep(1)
 
     # Send random driving controls
