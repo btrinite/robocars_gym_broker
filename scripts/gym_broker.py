@@ -159,6 +159,8 @@ class SimpleClient(SDClient):
         global camRotX
 
         msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "3", "img_enc" : "JPG", "offset_x" : "%s", "offset_y" : "%s", "offset_z" : "%s", "rot_x" : "%s" }' % (camOffsetX, camOffsetY, camOffsetZ, camRotX)
+        rospy.loginfo("Cam config")
+        rospy.loginfo(msg)
         self.send_now(msg)
         time.sleep(0.2)
         rospy.loginfo("socket polling timer %s", str(self.poll_socket_sleep_sec))
