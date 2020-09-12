@@ -22,6 +22,12 @@ throttling_order = 0.0
 braking_order = 0.0
 image_pub = {}
 hostSimulator="localhost"
+sceneName=""
+camOffsetX=""
+camOffsetY=""
+camOffsetZ=""
+camRotX=""
+
 bridge = CvBridge()
 
 def throttling_callback(data):
@@ -54,9 +60,35 @@ def initRosNode():
    
 def getConfig():
     global hostSimulator
+    global sceneName
+    global camOffsetX
+    global camOffsetY
+    global camOffsetZ
+    global camRotX
+
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
     hostSimulator = rospy.get_param("simulatorHost")
+    
+    if not rospy.has_param("sceneName"):
+        rospy.set_param("sceneName", "roboracingleague_1")
+    sceneName = rospy.get_param("sceneName")
+
+    if not rospy.has_param("camOffsetX"):
+        rospy.set_param("camOffsetX", "0")
+    camOffsetX = rospy.get_param("camOffsetX")
+
+    if not rospy.has_param("camOffsetY"):
+        rospy.set_param("camOffsetY", "1")
+    camOffsetY = rospy.get_param("camOffsetY")
+
+    if not rospy.has_param("camOffsetZ"):
+        rospy.set_param("camOffsetZ", "3")
+    camOffsetZ = rospy.get_param("camOffsetZ")
+
+    if not rospy.has_param("camRotX"):
+        rospy.set_param("camRotX", "75")
+    camRotX = rospy.get_param("camRotX")
 
 
 class SimpleClient(SDClient):
@@ -89,7 +121,7 @@ class SimpleClient(SDClient):
         if json_packet['msg_type'] == "scene_names":
             rospy.loginfo("Available Scene(s) %s", str(json_packet["scene_names"]))
             # Load Scene message. Only one client needs to send the load scene.
-            msg = '{ "msg_type" : "load_scene", "scene_name" : "roboracingleague_1" }'
+            msg = '{ "msg_type" : "load_scene", "scene_name" : "warehouse" }'
             self.send_now(msg)
             time.sleep(1)
             
@@ -119,7 +151,14 @@ class SimpleClient(SDClient):
         # the offset_z moves camera forward/back
         # with fish_eye_x/y == 0.0 then you get no distortion
         # img_enc can be one of JPG|PNG|TGA        
-        msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "3", "img_enc" : "JPG", "offset_x" : "0.0", "offset_y" : "1.0", "offset_z" : "3.0", "rot_x" : "75.0" }'
+
+        global sceneName
+        global camOffsetX
+        global camOffsetY
+        global camOffsetZ
+        global camRotX
+
+        msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "3", "img_enc" : "JPG", "offset_x" : "%s", "offset_y" : "%s", "offset_z" : "%s", "rot_x" : "%s" }' % (camOffsetX, camOffsetY, camOffsetZ, camRotX)
         self.send_now(msg)
         time.sleep(0.2)
         rospy.loginfo("socket polling timer %s", str(self.poll_socket_sleep_sec))
