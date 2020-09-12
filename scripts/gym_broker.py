@@ -50,7 +50,7 @@ def initRosNode():
    rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback)
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback)
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback)
-   image_pub = rospy.Publisher("/gym/image", Image, queue_size=10)
+   image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
    
 def getConfig():
     global hostSimulator
@@ -119,9 +119,10 @@ class SimpleClient(SDClient):
         # the offset_z moves camera forward/back
         # with fish_eye_x/y == 0.0 then you get no distortion
         # img_enc can be one of JPG|PNG|TGA        
-        msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "3", "img_enc" : "JPG", "offset_x" : "0.0", "offset_y" : "1.0", "offset_z" : "3.0", "rot_x" : "75.0" }'
+        msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "1", "img_enc" : "JPG", "offset_x" : "0.0", "offset_y" : "1.0", "offset_z" : "3.0", "rot_x" : "75.0" }'
         self.send_now(msg)
         time.sleep(0.2)
+        rospy.loginfo("socket polling timer %s", str(self.poll_socket_sleep_sec))
 
     def send_car_config(self):
         # Car config
@@ -197,14 +198,12 @@ def gym_broker():
     # Send random driving controls
     start = time.time()
     do_drive = True
-    r = rospy.Rate(120) # 60hz
     while do_drive and not rospy.is_shutdown() :
         for c in clients:
             c.update()
             if c.aborted:
                 print("Client socket problem, stopping driving.")
                 do_drive = False
-        r.sleep()
 
     time.sleep(3.0)
 
