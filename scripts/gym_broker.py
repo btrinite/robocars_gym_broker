@@ -119,9 +119,10 @@ class SimpleClient(SDClient):
             time.sleep(1)
 
         if json_packet['msg_type'] == "scene_names":
+            global sceneName
             rospy.loginfo("Available Scene(s) %s", str(json_packet["scene_names"]))
             # Load Scene message. Only one client needs to send the load scene.
-            msg = '{ "msg_type" : "load_scene", "scene_name" : "warehouse" }'
+            msg = '{ "msg_type" : "load_scene", "scene_name" : "%s" }' % (sceneName)
             self.send_now(msg)
             time.sleep(1)
             
@@ -152,7 +153,6 @@ class SimpleClient(SDClient):
         # with fish_eye_x/y == 0.0 then you get no distortion
         # img_enc can be one of JPG|PNG|TGA        
 
-        global sceneName
         global camOffsetX
         global camOffsetY
         global camOffsetZ
