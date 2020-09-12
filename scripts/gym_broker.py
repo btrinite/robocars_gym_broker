@@ -27,6 +27,7 @@ camOffsetX=""
 camOffsetY=""
 camOffsetZ=""
 camRotX=""
+camFov=""
 
 bridge = CvBridge()
 
@@ -65,6 +66,7 @@ def getConfig():
     global camOffsetY
     global camOffsetZ
     global camRotX
+    global camFov
 
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
@@ -89,6 +91,10 @@ def getConfig():
     if not rospy.has_param("camRotX"):
         rospy.set_param("camRotX", "75")
     camRotX = rospy.get_param("camRotX")
+
+    if not rospy.has_param("camFov"):
+        rospy.set_param("camFov", "150")
+    camFov = rospy.get_param("camFov")
 
 
 class SimpleClient(SDClient):
@@ -158,7 +164,7 @@ class SimpleClient(SDClient):
         global camOffsetZ
         global camRotX
 
-        msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "3", "img_enc" : "JPG", "offset_x" : "%s", "offset_y" : "%s", "offset_z" : "%s", "rot_x" : "%s" }' % (camOffsetX, camOffsetY, camOffsetZ, camRotX)
+        msg = '{ "msg_type" : "cam_config", "fov" : "%s", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "3", "img_enc" : "JPG", "offset_x" : "%s", "offset_y" : "%s", "offset_z" : "%s", "rot_x" : "%s" }' % (camFov, camOffsetX, camOffsetY, camOffsetZ, camRotX)
         rospy.loginfo("Cam config")
         rospy.loginfo(msg)
         self.send_now(msg)
