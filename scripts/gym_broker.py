@@ -89,7 +89,7 @@ class SimpleClient(SDClient):
         if json_packet['msg_type'] == "scene_names":
             rospy.loginfo("Available Scene(s) %s", str(json_packet["scene_names"]))
             # Load Scene message. Only one client needs to send the load scene.
-            msg = '{ "msg_type" : "load_scene", "scene_name" : "warehouse" }'
+            msg = '{ "msg_type" : "load_scene", "scene_name" : "roboracingleague_1" }'
             self.send_now(msg)
             time.sleep(1)
             
@@ -119,7 +119,7 @@ class SimpleClient(SDClient):
         # the offset_z moves camera forward/back
         # with fish_eye_x/y == 0.0 then you get no distortion
         # img_enc can be one of JPG|PNG|TGA        
-        msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "1", "img_enc" : "JPG", "offset_x" : "0.0", "offset_y" : "1.0", "offset_z" : "3.0", "rot_x" : "75.0" }'
+        msg = '{ "msg_type" : "cam_config", "fov" : "150", "fish_eye_x" : "0.0", "fish_eye_y" : "0.0", "img_w" : "160", "img_h" : "120", "img_d" : "3", "img_enc" : "JPG", "offset_x" : "0.0", "offset_y" : "1.0", "offset_z" : "3.0", "rot_x" : "75.0" }'
         self.send_now(msg)
         time.sleep(0.2)
         rospy.loginfo("socket polling timer %s", str(self.poll_socket_sleep_sec))
