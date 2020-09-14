@@ -214,7 +214,7 @@ class SimpleClient(SDClient):
         seqDiff = seq - lastSeq
         if (seqDiff>1):
             rospy.logwarn("GYM Broker : Missed %s images", str(seqDiff-1))
-
+        lastSeq = seq
         msg = { "msg_type" : "control",
                 "steering" : steering.__str__(),
                 "throttle" : throttle.__str__(),
