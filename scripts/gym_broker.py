@@ -54,9 +54,9 @@ def initRosNode():
    # run simultaneously.
    global image_pub
    rospy.init_node('gym_broker', anonymous=False)
-   rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback)
-   rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback)
-   rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback)
+   rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback, queue_size=1)
+   rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback, queue_size=1)
+   rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback, queue_size=1)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
    
 def getConfig():
