@@ -20,8 +20,6 @@ from robocars_msgs.msg import robocars_actuator_output
 steering_order = 0.0
 throttling_order = 0.0
 braking_order = 0.0
-seq = 0
-lastSeq = 0
 image_pub = {}
 hostSimulator="localhost"
 sceneName=""
@@ -41,9 +39,7 @@ def throttling_callback(data):
 def steering_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " steering %s", str(data.norm))
    global steering_order
-   global seq
    steering_order = -data.norm
-   seq = data.header.seq
 
 def braking_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " steering %s", str(data.norm))
@@ -210,12 +206,6 @@ class SimpleClient(SDClient):
         
 
     def send_controls(self, steering, throttle):
-        global lastSeq
-        global seq
-        seqDiff = seq - lastSeq
-        if (seqDiff>1):
-            rospy.logwarn("GYM Broker : Missed %s images", str(seqDiff-1))
-        lastSeq = seq
         msg = { "msg_type" : "control",
                 "steering" : steering.__str__(),
                 "throttle" : throttle.__str__(),
