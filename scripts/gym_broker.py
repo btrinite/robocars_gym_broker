@@ -141,7 +141,8 @@ class SimpleClient(SDClient):
             imgRaw = base64.b64decode(imgString)
             img = np.frombuffer(imgRaw, dtype='uint8')
             cv_image = cv2.imdecode(img,cv2.IMREAD_COLOR)
-            image_message = bridge.cv2_to_imgmsg(cv_image, encoding="bgr8")
+            blured_img = cv2.medianBlur(cv_image, 5)
+            image_message = bridge.cv2_to_imgmsg(blured_img, encoding="bgr8")
             if image_pub:
                 image_pub.publish(image_message)
 
