@@ -133,7 +133,8 @@ class SimpleClient(SDClient):
             time.sleep(1)
             
         if json_packet['msg_type'] == "telemetry":
-            if json_packet["hit"] != "None":
+            if json_packet["hit"] != "none":
+                rospy.loginfo("Hit "+str(json_packet["hit"]))
                 self.send_reset_car()
             imgString = json_packet["image"]
             imgRaw = base64.b64decode(imgString)
