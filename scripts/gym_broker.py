@@ -133,6 +133,8 @@ class SimpleClient(SDClient):
             time.sleep(1)
             
         if json_packet['msg_type'] == "telemetry":
+            if json_packet["hit"] != "None":
+                self.send_reset_car()
             imgString = json_packet["image"]
             imgRaw = base64.b64decode(imgString)
             img = np.frombuffer(imgRaw, dtype='uint8')
@@ -146,6 +148,11 @@ class SimpleClient(SDClient):
 
     def send_init(self):
         msg = '{ "msg_type" : "get_protocol_version" }'
+        self.send_now(msg)
+        time.sleep(1)
+
+    def send_reset_car(self):
+        msg = '{ "msg_type" : "reset_car" }'
         self.send_now(msg)
         time.sleep(1)
 
