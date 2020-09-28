@@ -61,7 +61,7 @@ def initRosNode():
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback, queue_size=1)
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback, queue_size=1)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
-   speed_pub = rospy.Publisher('/gym/cmd_vel', Twist, queue_size=1)
+   speed_pub = rospy.Publisher('/gym/speed', Twist, queue_size=1)
    
 def getConfig():
     global hostSimulator
