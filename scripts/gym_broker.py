@@ -213,11 +213,11 @@ class SimpleClient(SDClient):
         time.sleep(0.2)
         
 
-    def send_controls(self, steering, throttle):
+    def send_controls(self, steering, throttle, brake):
         msg = { "msg_type" : "control",
                 "steering" : steering.__str__(),
                 "throttle" : throttle.__str__(),
-                "brake" : "0.0" }
+                "brake" : brake.__str__() }
         
         self.send(json.dumps(msg))
 
@@ -231,9 +231,10 @@ class SimpleClient(SDClient):
         global braking_order
         st = steering_order 
         th = throttling_order
-        if (braking_order > 0.2):
-            th = - braking_order
-        self.send_controls(st, th)
+        brk = braking_order
+        #if (braking_order > 0.2):
+        #    th = - braking_order
+        self.send_controls(st, th, brk)
 
 def gym_broker():
     global hostSimulator
