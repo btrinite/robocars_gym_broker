@@ -10,6 +10,7 @@ import logging
 import cv2
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+from geometry_msgs.msg import Twist
 import numpy as np
 
 from gym_donkeycar.core.sim_client import SDClient
@@ -21,6 +22,7 @@ steering_order = 0.0
 throttling_order = 0.0
 braking_order = 0.0
 image_pub = {}
+speed_pub = {}
 hostSimulator="localhost"
 sceneName=""
 camOffsetX=""
@@ -53,11 +55,13 @@ def initRosNode():
    # name for our 'listener' node so that multiple listeners can
    # run simultaneously.
    global image_pub
+   global speed_oub
    rospy.init_node('gym_broker', anonymous=False)
    rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback, queue_size=1)
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback, queue_size=1)
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback, queue_size=1)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
+   speed_pub = rospy.Publisher('/gym/cmd_vel', Twist, queue_size=1)
    
 def getConfig():
     global hostSimulator
@@ -106,6 +110,7 @@ class SimpleClient(SDClient):
 
     def on_msg_recv(self, json_packet):
         global image_pub
+        global speed_pub
         if (json_packet["msg_type"] != "telemetry"):
             rospy.loginfo("GYM got message %s", str(json_packet["msg_type"]))
 
@@ -144,6 +149,11 @@ class SimpleClient(SDClient):
             image_message = bridge.cv2_to_imgmsg(blured_img, encoding="bgr8")
             if image_pub:
                 image_pub.publish(image_message)
+            move_cmd = Twist()
+            move_cmd.linear.x = json_packet["speed"]
+            if speed_pub:
+                speed_pub.publish(move_cmd)
+
 
         #print("got:", json_packet)
 
