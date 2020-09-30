@@ -196,7 +196,7 @@ class SimpleClient(SDClient):
         # body_rgb  = (128, 128, 128) tuple of ints
         car_name = "GrumpyCar"
 
-        msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "0", "body_g" : "255", "body_b" : "0", "car_name" : "%s", "font_size" : "100" }' % (car_name)
+        msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "0", "body_g" : "255", "body_b" : "0", "car_name" : "%s", "font_size" : "20" }' % (car_name)
         self.send_now(msg)
 
         #this sleep gives the car time to spawn. Once it's spawned, it's ready for the camera config.
