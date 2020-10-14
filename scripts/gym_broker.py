@@ -248,6 +248,8 @@ class SimpleClient(SDClient):
         global steering_order
         global throttling_order
         global braking_order
+        global reset_order
+        global last_reset_order
         st = steering_order 
         th = throttling_order
         brk = braking_order
