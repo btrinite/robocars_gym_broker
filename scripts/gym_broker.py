@@ -150,7 +150,7 @@ class SimpleClient(SDClient):
             if image_pub:
                 image_pub.publish(image_message)
             telem_msg = robocars_telemetry()
-            telem_msg.speed = json_packet["speed"]
+            telem_msg.speed = json_packet["speed"]/20.0
             telem_msg.cte = json_packet["cte"]
             if telem_pub:
                 telem_pub.publish(telem_msg)
