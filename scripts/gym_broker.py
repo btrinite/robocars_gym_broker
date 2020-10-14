@@ -17,10 +17,13 @@ from gym_donkeycar.core.sim_client import SDClient
 from robocars_msgs.msg import robocars_radio_channels
 from robocars_msgs.msg import robocars_actuator_output
 from robocars_msgs.msg import robocars_telemetry
+from robocars_msgs.msg import robocars_switch
 
 steering_order = 0.0
 throttling_order = 0.0
 braking_order = 0.0
+last_reset_order = 0.0
+reset_order = 0.0
 image_pub = {}
 telem_pub = {}
 hostSimulator="localhost"
@@ -48,6 +51,10 @@ def braking_callback(data):
    global braking_order
    braking_order = -data.norm
 
+def switch_callback(data):
+   global reset_order
+   reset_order = data.switchs[1]
+
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
    # name are launched, the previous one is kicked off. The
@@ -60,6 +67,7 @@ def initRosNode():
    rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback, queue_size=1)
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback, queue_size=1)
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback, queue_size=1)
+   rospy.Subscriber("/switch_ctrl/state", robocars_switch, switch_callback, queue_size=1)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
    telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=1)
    
@@ -245,6 +253,11 @@ class SimpleClient(SDClient):
         brk = braking_order
         #if (braking_order > 0.2):
         #    th = - braking_order
+        if (reset_order != last_reset_order):
+            if (reset_order == 2):
+                self.send_reset_car()
+            reset_order = last_reset_order
+
         self.send_controls(st, th, brk)
 
 def gym_broker():
