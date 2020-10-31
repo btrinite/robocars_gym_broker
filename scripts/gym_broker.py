@@ -27,6 +27,7 @@ reset_order = 0.0
 image_pub = {}
 telem_pub = {}
 hostSimulator="localhost"
+hostPort=9091
 sceneName=""
 camOffsetX=""
 camOffsetY=""
@@ -73,6 +74,7 @@ def initRosNode():
    
 def getConfig():
     global hostSimulator
+    global hostPort
     global sceneName
     global camOffsetX
     global camOffsetY
@@ -83,6 +85,9 @@ def getConfig():
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
     hostSimulator = rospy.get_param("simulatorHost")
+    if not rospy.has_param("simulatorPort"):
+        rospy.set_param("simulatorPort", 9091)
+    hostPort = rospy.get_param("simulatorPort")
     
     if not rospy.has_param("sceneName"):
         rospy.set_param("sceneName", "roboracingleague_1")
@@ -148,7 +153,7 @@ class SimpleClient(SDClient):
         if json_packet['msg_type'] == "telemetry":
             if json_packet["hit"] != "none":
                 rospy.loginfo("Hit "+str(json_packet["hit"]))
-                self.send_reset_car()
+                #self.send_reset_car()
             imgString = json_packet["image"]
             imgRaw = base64.b64decode(imgString)
             img = np.frombuffer(imgRaw, dtype='uint8')
@@ -264,10 +269,11 @@ class SimpleClient(SDClient):
 
 def gym_broker():
     global hostSimulator
+    global hostPort
     logging.basicConfig(level=logging.DEBUG)
 
     # test params
-    port = 9091
+    port = 9090
     num_clients = 1
     clients = []
 
@@ -276,7 +282,7 @@ def gym_broker():
     rospy.loginfo("Will connect to simulator host %s", str(hostSimulator))
 
 
-    clients.append(SimpleClient(address=(hostSimulator, port)))
+    clients.append(SimpleClient(address=(hostSimulator, hostPort)))
     time.sleep(1)
 
     # Send random driving controls
@@ -292,8 +298,8 @@ def gym_broker():
     time.sleep(3.0)
 
     #Exit Scene - optionally..
-    msg = '{ "msg_type" : "exit_scene" }'
-    clients[0].send_now(msg)
+    #msg = '{ "msg_type" : "exit_scene" }'
+    #clients[0].send_now(msg)
 
     # Close down clients
     print("waiting for msg loop to stop")
