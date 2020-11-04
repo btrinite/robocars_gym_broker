@@ -178,6 +178,7 @@ class SimpleClient(SDClient):
         time.sleep(1)
 
     def send_reset_car(self):
+        rospy.loginfo("Send reset order")
         msg = '{ "msg_type" : "reset_car" }'
         self.send_now(msg)
         time.sleep(1)
