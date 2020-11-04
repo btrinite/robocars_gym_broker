@@ -34,6 +34,7 @@ camOffsetY=""
 camOffsetZ=""
 camRotX=""
 camFov=""
+_count=0
 
 bridge = CvBridge()
 
@@ -238,11 +239,13 @@ class SimpleClient(SDClient):
         
 
     def send_controls(self, steering, throttle, brake):
+        global _count
+        _count=_count+1
         msg = { "msg_type" : "control",
                 "steering" : steering.__str__(),
                 "throttle" : throttle.__str__(),
-                "brake" : brake.__str__() }
-        
+                "brake" : brake.__str__(), 
+                "_count" : _count}
         self.send(json.dumps(msg))
 
         #this sleep lets the SDClient thread poll our message and send it out.
