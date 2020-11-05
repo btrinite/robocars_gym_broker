@@ -18,6 +18,7 @@ from robocars_msgs.msg import robocars_radio_channels
 from robocars_msgs.msg import robocars_actuator_output
 from robocars_msgs.msg import robocars_telemetry
 from robocars_msgs.msg import robocars_switch
+from robocars_msgs.msg import robocars_brain_state
 
 steering_order = 0.0
 throttling_order = 0.0
@@ -35,6 +36,8 @@ camOffsetZ=""
 camRotX=""
 camFov=""
 _count=0
+
+state = robocars_brain_state.BRAIN_STATE_IDLE
 
 bridge = CvBridge()
 
@@ -57,6 +60,13 @@ def switch_callback(data):
    global reset_order
    reset_order = data.switchs[1]
 
+def state_callback(data):
+    global state
+    if (data.state != state):
+        state = data.state
+        rospy.loginfo("brain state change event %s", str(state))
+
+
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
    # name are launched, the previous one is kicked off. The
@@ -70,6 +80,7 @@ def initRosNode():
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback, queue_size=1)
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback, queue_size=1)
    rospy.Subscriber("/switch_ctrl/state", robocars_switch, switch_callback, queue_size=1)
+   rospy.Subscriber("/robocars_brain_state", robocars_brain_state, state_callback, queue_size=1)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
    telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=1)
    
