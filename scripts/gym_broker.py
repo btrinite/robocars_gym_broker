@@ -38,6 +38,7 @@ camFov=""
 _count=0
 
 state = robocars_brain_state.BRAIN_STATE_IDLE
+last_state = -1
 
 bridge = CvBridge()
 
@@ -62,9 +63,8 @@ def switch_callback(data):
 
 def state_callback(data):
     global state
-    if (data.state != state):
-        state = data.state
-        rospy.loginfo("brain state change event %s", str(state))
+    state = data.state
+
 
 
 def initRosNode():
@@ -217,13 +217,13 @@ class SimpleClient(SDClient):
         time.sleep(0.2)
         rospy.loginfo("socket polling timer %s", str(self.poll_socket_sleep_sec))
 
-    def send_car_config(self):
+    def send_car_config(self, r=192, g=192, b=192):
         # Car config
         # body_style = "donkey" | "bare" | "car01" choice of string
         # body_rgb  = (128, 128, 128) tuple of ints
         car_name = "GrumpyCar"
 
-        msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "0", "body_g" : "255", "body_b" : "0", "car_name" : "%s", "font_size" : "20" }' % (car_name)
+        msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "%s", "body_g" : "%s", "body_b" : "%s", "car_name" : "%s", "font_size" : "20" }' % (r, g, b, car_name)
         self.send_now(msg)
 
         #this sleep gives the car time to spawn. Once it's spawned, it's ready for the camera config.
@@ -270,6 +270,9 @@ class SimpleClient(SDClient):
         global braking_order
         global reset_order
         global last_reset_order
+        global state
+        global last_state
+
         st = steering_order 
         th = throttling_order
         brk = braking_order
@@ -279,6 +282,18 @@ class SimpleClient(SDClient):
             if (reset_order == 2):
                 self.send_reset_car()
             reset_order = last_reset_order
+
+        if (state != last_state):
+            last_state = state
+            rospy.loginfo("brain state change event %s", str(state))
+            if (state == robocars_brain_state.BRAIN_STATE_IDLE):
+                self.send_car_config(0,255,0)
+            if (state == robocars_brain_state.BRAIN_STATE_MANUAL_DRIVING):
+                self.send_car_config(255,0,0)
+            if (state == robocars_brain_state.BRAIN_STATE_AUTONOMOUS_DRIVING):
+                self.send_car_config(0,0,255)
+
+
 
         self.send_controls(st, th, brk)
 
