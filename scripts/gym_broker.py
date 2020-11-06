@@ -322,6 +322,7 @@ def gym_broker():
     initRosNode()
     getConfig()
     rospy.loginfo("Will connect to simulator host %s", str(hostSimulator))
+    rospy.loginfo("Will create %s cars instances", str(num_clients))
 
     for _ in range(0, num_clients):
         c = SimpleClient(address=(hostSimulator, hostPort))
