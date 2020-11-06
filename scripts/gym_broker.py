@@ -130,7 +130,7 @@ def getConfig():
 
     if not rospy.has_param("num_clients"):
         rospy.set_param("num_clients", "1")
-    camFov = rospy.get_param("num_clients")
+    num_clients = rospy.get_param("num_clients")
     
 class SimpleClient(SDClient):
 
