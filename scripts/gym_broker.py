@@ -37,6 +37,7 @@ camOffsetZ=""
 camRotX=""
 camFov=""
 _count=0
+num_clients=1
 
 state = robocars_brain_state.BRAIN_STATE_IDLE
 last_state = -1
@@ -94,6 +95,7 @@ def getConfig():
     global camOffsetZ
     global camRotX
     global camFov
+    global num_clients
 
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
@@ -126,7 +128,10 @@ def getConfig():
         rospy.set_param("camFov", "150")
     camFov = rospy.get_param("camFov")
 
-
+    if not rospy.has_param("num_clients"):
+        rospy.set_param("num_clients", 1)
+    camFov = rospy.get_param("num_clients")
+    
 class SimpleClient(SDClient):
 
     id_iter = itertools.count()
@@ -306,19 +311,22 @@ class SimpleClient(SDClient):
 def gym_broker():
     global hostSimulator
     global hostPort
+    global num_clients
+
     logging.basicConfig(level=logging.DEBUG)
 
     # test params
     port = 9090
-    num_clients = 1
     clients = []
 
     initRosNode()
     getConfig()
     rospy.loginfo("Will connect to simulator host %s", str(hostSimulator))
 
+    for _ in range(0, num_clients):
+        c = SimpleClient(address=(hostSimulator, hostPort))
+        clients.append(c)
 
-    clients.append(SimpleClient(address=(hostSimulator, hostPort)))
     time.sleep(1)
 
     # Send random driving controls
