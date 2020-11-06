@@ -37,7 +37,7 @@ camOffsetZ=""
 camRotX=""
 camFov=""
 _count=0
-num_clients=1
+num_clients="1"
 
 state = robocars_brain_state.BRAIN_STATE_IDLE
 last_state = -1
@@ -129,7 +129,7 @@ def getConfig():
     camFov = rospy.get_param("camFov")
 
     if not rospy.has_param("num_clients"):
-        rospy.set_param("num_clients", 1)
+        rospy.set_param("num_clients", "1")
     camFov = rospy.get_param("num_clients")
     
 class SimpleClient(SDClient):
@@ -324,7 +324,7 @@ def gym_broker():
     rospy.loginfo("Will connect to simulator host %s", str(hostSimulator))
     rospy.loginfo("Will create %s cars instances", str(num_clients))
 
-    for _ in range(0, num_clients):
+    for _ in range(0, int(num_clients)):
         c = SimpleClient(address=(hostSimulator, hostPort))
         clients.append(c)
 
