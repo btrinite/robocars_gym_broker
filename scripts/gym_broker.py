@@ -176,13 +176,13 @@ class SimpleClient(SDClient):
             cv_image = cv2.imdecode(img,cv2.IMREAD_COLOR)
             blured_img = cv2.medianBlur(cv_image, 5)
             image_message = bridge.cv2_to_imgmsg(blured_img, encoding="bgr8")
-            image_message.header.frame_id=self.id
+            image_message.header.frame_id=str(self.id)
             if image_pub:
                 image_pub.publish(image_message)
             telem_msg = robocars_telemetry()
             telem_msg.speed = json_packet["speed"]/20.0
             telem_msg.cte = json_packet["cte"]
-            telem_msg.header.frame_id=self.id
+            telem_msg.header.frame_id=str(self.id)
             if telem_pub:
                 telem_pub.publish(telem_msg)
 
