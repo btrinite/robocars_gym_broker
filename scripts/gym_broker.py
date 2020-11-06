@@ -39,17 +39,17 @@ bridge = CvBridge()
 
 def throttling_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " throttling %s", str(data.norm))
-   if clients[data.header.frame_id].get() != None:
+   if clients.get(data.header.frame_id) != None:
         clients[data.header.frame_id].set_throttle(data.norm)
 
 def steering_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " steering %s", str(data.norm))
-   if clients[data.header.frame_id].get() != None:
+   if clients.get(data.header.frame_id) != None:
        clients[data.header.frame_id].set_steering(-data.norm)
 
 def braking_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " steering %s", str(data.norm))
-   if clients[data.header.frame_id].get() != None:
+   if clients.get(data.header.frame_id) != None:
        clients[data.header.frame_id].set_braking(-data.norm)
 
 def switch_callback(data):
