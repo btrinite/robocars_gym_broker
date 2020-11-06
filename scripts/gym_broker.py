@@ -342,8 +342,8 @@ def gym_broker():
     do_drive = True
     while do_drive and not rospy.is_shutdown() :
         for c in clients:
-            c.update()
-            if c.aborted:
+            clients[c].update()
+            if clients[c].aborted:
                 print("Client socket problem, stopping driving.")
                 do_drive = False
 
@@ -356,7 +356,7 @@ def gym_broker():
     # Close down clients
     print("waiting for msg loop to stop")
     for c in clients:
-        c.stop()
+        clients[c].stop()
 
     print("clients to stopped")
 
