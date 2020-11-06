@@ -232,7 +232,7 @@ class SimpleClient(SDClient):
         # Car config
         # body_style = "donkey" | "bare" | "car01" choice of string
         # body_rgb  = (128, 128, 128) tuple of ints
-        car_name = "GrumpyCar"
+        car_name = "GrumpyCar"+str(self.id)
 
         msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "%s", "body_g" : "%s", "body_b" : "%s", "car_name" : "%s", "font_size" : "20" }' % (r, g, b, car_name)
         self.send_now(msg)
