@@ -305,13 +305,10 @@ class SimpleClient(SDClient):
             rospy.loginfo("brain state change event %s", str(self.state))
             if (self.state == robocars_brain_state.BRAIN_STATE_IDLE):
                 self.send_car_config(0,255,0)
-            if (state == robocars_brain_state.BRAIN_STATE_MANUAL_DRIVING):
+            if (self.state == robocars_brain_state.BRAIN_STATE_MANUAL_DRIVING):
                 self.send_car_config(255,0,0)
-            if (state == robocars_brain_state.BRAIN_STATE_AUTONOMOUS_DRIVING):
+            if (self.state == robocars_brain_state.BRAIN_STATE_AUTONOMOUS_DRIVING):
                 self.send_car_config(0,0,255)
-
-
-
         self.send_controls(st, th, brk)
 
 def gym_broker():
