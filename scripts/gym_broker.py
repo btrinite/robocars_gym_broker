@@ -134,7 +134,7 @@ class SimpleClient(SDClient):
         self.id = next(self.id_iter)
         self.state = robocars_brain_state.BRAIN_STATE_IDLE
         self.last_state = -1
-        self.throttling = 0
+        self.throttle = 0
         self.steering = 0
         self.braking = 0
         self.reset_order = 0
