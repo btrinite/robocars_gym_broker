@@ -294,7 +294,7 @@ class SimpleClient(SDClient):
         # just random steering now
 
         st = self.steering
-        th = self.throttling
+        th = self.throttle
         brk = self.braking
         #if (braking_order > 0.2):
         #    th = - braking_order
