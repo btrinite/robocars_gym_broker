@@ -51,11 +51,11 @@ def braking_callback(data):
 
 def switch_callback(data):
     for c in clients:
-        c.set_reset_order(data.switchs[1])
+        clients[c].set_reset_order(data.switchs[1])
 
 def state_callback(data):
     for c in clients:
-        c.set_state(data.state)
+        clients[c].set_state(data.state)
 
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
