@@ -33,7 +33,7 @@ camRotX=""
 camFov=""
 _count=0
 num_clients="1"
-clients = []
+clients = {}
 
 bridge = CvBridge()
 
