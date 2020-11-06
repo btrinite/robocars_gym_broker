@@ -11,6 +11,7 @@ import cv2
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 import numpy as np
+import itertools
 
 from gym_donkeycar.core.sim_client import SDClient
 
@@ -128,10 +129,13 @@ def getConfig():
 
 class SimpleClient(SDClient):
 
+    newid = itertools.count().next
+
     def __init__(self, address, poll_socket_sleep_time=0.01):
         super().__init__(*address, poll_socket_sleep_time=poll_socket_sleep_time)
         self.last_image = None
         self.car_loaded = False
+        self.id = resource_cl.newid()
 
     def on_msg_recv(self, json_packet):
         global image_pub
@@ -172,11 +176,13 @@ class SimpleClient(SDClient):
             cv_image = cv2.imdecode(img,cv2.IMREAD_COLOR)
             blured_img = cv2.medianBlur(cv_image, 5)
             image_message = bridge.cv2_to_imgmsg(blured_img, encoding="bgr8")
+            image_message.header.frame_id=self.id
             if image_pub:
                 image_pub.publish(image_message)
             telem_msg = robocars_telemetry()
             telem_msg.speed = json_packet["speed"]/20.0
             telem_msg.cte = json_packet["cte"]
+            telem_msg.header.frame_id=self.id
             if telem_pub:
                 telem_pub.publish(telem_msg)
 
