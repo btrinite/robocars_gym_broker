@@ -290,9 +290,9 @@ class SimpleClient(SDClient):
     def update(self):
         # just random steering now
 
-        st = self.steering_order 
-        th = self.throttling_order
-        brk = self.braking_order
+        st = self.steering
+        th = self.throttling
+        brk = self.braking
         #if (braking_order > 0.2):
         #    th = - braking_order
         if (self.reset_order != self.last_reset_order):
