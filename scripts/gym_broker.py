@@ -21,11 +21,6 @@ from robocars_msgs.msg import robocars_telemetry
 from robocars_msgs.msg import robocars_switch
 from robocars_msgs.msg import robocars_brain_state
 
-steering_order = 0.0
-throttling_order = 0.0
-braking_order = 0.0
-last_reset_order = 0.0
-reset_order = 0.0
 image_pub = {}
 telem_pub = {}
 hostSimulator="localhost"
@@ -38,36 +33,29 @@ camRotX=""
 camFov=""
 _count=0
 num_clients="1"
-
-state = robocars_brain_state.BRAIN_STATE_IDLE
-last_state = -1
+clients = []
 
 bridge = CvBridge()
 
 def throttling_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " throttling %s", str(data.norm))
-   global throttling_order
-   throttling_order = data.norm
+   client[data.header.frame_id].set_throttle(data.norm)
 
 def steering_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " steering %s", str(data.norm))
-   global steering_order
-   steering_order = -data.norm
+   client[data.header.frame_id].set_steering(-data.norm)
 
 def braking_callback(data):
    #rospy.loginfo(rospy.get_caller_id() + " steering %s", str(data.norm))
-   global braking_order
-   braking_order = -data.norm
+   client[data.header.frame_id].set_braking(-data.norm)
 
 def switch_callback(data):
-   global reset_order
-   reset_order = data.switchs[1]
+    for c in clients:
+        c.set_reset_order(data.switchs[1])
 
 def state_callback(data):
-    global state
-    state = data.state
-
-
+    for c in clients:
+        c.set_state(data.state)
 
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
@@ -141,6 +129,31 @@ class SimpleClient(SDClient):
         self.last_image = None
         self.car_loaded = False
         self.id = next(self.id_iter)
+        self.state = robocars_brain_state.BRAIN_STATE_IDLE
+        self.last_state = -1
+        self.throttling = 0
+        self.steering = 0
+        self.braking = 0
+        self.reset_order = 0
+        self.last_reset_order = 0
+
+    def getId(self):
+        return self.id
+
+    def set_throttle(self, throttle):
+        self.throttle=throttle
+
+    def set_steering(self, steering):
+        self.steering=steering
+
+    def set_braking(self, braking):
+        self.braking=braking
+
+    def set_reset_order(self, reset_order):
+        self.reset_order=reset_order
+
+    def set_state(self, state):
+        self.state=state
 
     def on_msg_recv(self, json_packet):
         global image_pub
@@ -276,28 +289,21 @@ class SimpleClient(SDClient):
 
     def update(self):
         # just random steering now
-        global steering_order
-        global throttling_order
-        global braking_order
-        global reset_order
-        global last_reset_order
-        global state
-        global last_state
 
-        st = steering_order 
-        th = throttling_order
-        brk = braking_order
+        st = self.steering_order 
+        th = self.throttling_order
+        brk = self.braking_order
         #if (braking_order > 0.2):
         #    th = - braking_order
-        if (reset_order != last_reset_order):
-            if (reset_order == 2):
+        if (self.reset_order != self.last_reset_order):
+            if (self.reset_order == 2):
                 self.send_reset_car()
-            reset_order = last_reset_order
+            self.reset_order = self.last_reset_order
 
-        if (state != last_state):
-            last_state = state
-            rospy.loginfo("brain state change event %s", str(state))
-            if (state == robocars_brain_state.BRAIN_STATE_IDLE):
+        if (self.state != self.last_state):
+            self.last_state = self.state
+            rospy.loginfo("brain state change event %s", str(self.state))
+            if (self.state == robocars_brain_state.BRAIN_STATE_IDLE):
                 self.send_car_config(0,255,0)
             if (state == robocars_brain_state.BRAIN_STATE_MANUAL_DRIVING):
                 self.send_car_config(255,0,0)
@@ -312,12 +318,12 @@ def gym_broker():
     global hostSimulator
     global hostPort
     global num_clients
+    global clients
 
     logging.basicConfig(level=logging.DEBUG)
 
     # test params
     port = 9090
-    clients = []
 
     initRosNode()
     getConfig()
@@ -326,7 +332,8 @@ def gym_broker():
 
     for _ in range(0, int(num_clients)):
         c = SimpleClient(address=(hostSimulator, hostPort))
-        clients.append(c)
+        clients[str(c.getId())]=c
+        
 
     time.sleep(1)
 
