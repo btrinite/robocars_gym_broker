@@ -129,13 +129,13 @@ def getConfig():
 
 class SimpleClient(SDClient):
 
-    newid = itertools.count().next
+    id_iter = itertools.count()
 
     def __init__(self, address, poll_socket_sleep_time=0.01):
         super().__init__(*address, poll_socket_sleep_time=poll_socket_sleep_time)
         self.last_image = None
         self.car_loaded = False
-        self.id = resource_cl.newid()
+        self.id = next(self.id_iter)
 
     def on_msg_recv(self, json_packet):
         global image_pub
