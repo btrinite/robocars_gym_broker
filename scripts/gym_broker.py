@@ -141,11 +141,12 @@ def getConfig():
 
 class SimpleClient(SDClient):
 
-    id_iter = itertools.count()
+    id_iter = itertools.count(0)
 
     @staticmethod
     def initIdEnumerator():
-        id_iter = itertools.count()
+
+        SimpleClient.id_iter = itertools.count(0)
 
 
 
