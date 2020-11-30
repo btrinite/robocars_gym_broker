@@ -329,11 +329,29 @@ class SimpleClient(SDClient):
                 self.send_car_config(0,0,255)
         self.send_controls(st, th, brk)
 
-def gym_broker():
+def connect():
     global hostSimulator
     global hostPort
     global num_clients
     global clients
+
+    rospy.loginfo("Will connect to simulator host %s", str(hostSimulator))
+    rospy.loginfo("Will create %s cars instances", str(num_clients))
+
+    for _ in range(0, int(num_clients)):
+        c = SimpleClient(address=(hostSimulator, hostPort))
+        clients[str(c.getId())]=c
+
+    time.sleep(1)
+
+def disconnect():
+    global clients
+    for c in clients:
+        clients[c].stop()
+        del clients[c]
+
+
+def gym_broker():
 
     logging.basicConfig(level=logging.DEBUG)
 
@@ -342,15 +360,8 @@ def gym_broker():
 
     initRosNode()
     getConfig()
-    rospy.loginfo("Will connect to simulator host %s", str(hostSimulator))
-    rospy.loginfo("Will create %s cars instances", str(num_clients))
-
-    for _ in range(0, int(num_clients)):
-        c = SimpleClient(address=(hostSimulator, hostPort))
-        clients[str(c.getId())]=c
         
 
-    time.sleep(1)
 
     # Send random driving controls
     start = time.time()
@@ -363,15 +374,13 @@ def gym_broker():
                 do_drive = False
 
     time.sleep(3.0)
-
+    disconnect()
     #Exit Scene - optionally..
     #msg = '{ "msg_type" : "exit_scene" }'
     #clients[0].send_now(msg)
 
     # Close down clients
     print("waiting for msg loop to stop")
-    for c in clients:
-        clients[c].stop()
 
     print("clients to stopped")
 
