@@ -70,7 +70,7 @@ def rc_connect_sim_callback(data):
 
 def rc_reset_car_callback(data):
     for c in clients:
-        clients[c].set_reset_order(data)
+        clients[c].set_reset_order(data.data)
 
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
