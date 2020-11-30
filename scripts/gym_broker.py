@@ -173,7 +173,11 @@ class SimpleClient(SDClient):
         self.braking=braking
 
     def set_reset_order(self, reset_order):
-        self.reset_order=reset_order
+        if ( reset_order==2):
+            if (self.last_reset_order==0):
+                self.reset_order=reset_order
+            else:
+                self.last_reset_order=0
 
     def set_state(self, state):
         self.state=state
@@ -321,7 +325,7 @@ class SimpleClient(SDClient):
         if (self.reset_order != self.last_reset_order):
             if (self.reset_order == 2):
                 self.send_reset_car()
-            self.reset_order = self.last_reset_order
+                self.last_reset_order = self.reset_order
 
         if (self.state != self.last_state):
             self.last_state = self.state
