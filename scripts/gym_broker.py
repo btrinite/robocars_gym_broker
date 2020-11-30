@@ -346,7 +346,7 @@ def connect():
 
 def disconnect():
     global clients
-    for c in clients:
+    for c in list(clients):
         clients[c].stop()
         del clients[c]
 
