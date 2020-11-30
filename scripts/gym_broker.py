@@ -69,9 +69,8 @@ def rc_connect_sim_callback(data):
         SimpleClient.initIdEnumerator()
 
 def rc_reset_car_callback(data):
-    if (data.data == 1):
-        for c in clients:
-            clients[c].set_reset_order(2)
+    for c in clients:
+        clients[c].set_reset_order(data)
 
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
@@ -147,8 +146,6 @@ class SimpleClient(SDClient):
     def initIdEnumerator():
 
         SimpleClient.id_iter = itertools.count(0)
-
-
 
     def __init__(self, address, poll_socket_sleep_time=0.01):
         super().__init__(*address, poll_socket_sleep_time=poll_socket_sleep_time)
