@@ -365,7 +365,7 @@ def gym_broker():
     start = time.time()
     do_drive = True
     while do_drive and not rospy.is_shutdown() :
-        for c in clients:
+        for c in list(clients):
             try:
                 clients[c].update()
                 if clients[c].aborted:
