@@ -63,9 +63,9 @@ def state_callback(data):
 
 def rc_connect_sim_callback(data):
     if (data.data == 1):
-        pass
+        connect()
     else:
-        pass
+        disconnect()
 
 def rc_reset_car_callback(data):
     if (data.data == 1):
