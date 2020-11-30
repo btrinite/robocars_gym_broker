@@ -366,10 +366,13 @@ def gym_broker():
     do_drive = True
     while do_drive and not rospy.is_shutdown() :
         for c in clients:
-            clients[c].update()
-            if clients[c].aborted:
-                print("Client socket problem, stopping driving.")
-                do_drive = False
+            try:
+                clients[c].update()
+                if clients[c].aborted:
+                    print("Client socket problem, stopping driving.")
+                    do_drive = False
+            except:
+                pass
 
     time.sleep(3.0)
     disconnect()
