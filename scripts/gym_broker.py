@@ -66,6 +66,7 @@ def rc_connect_sim_callback(data):
         connect()
     else:
         disconnect()
+        SimpleClient.initIdEnumerator()
 
 def rc_reset_car_callback(data):
     if (data.data == 1):
@@ -137,10 +138,16 @@ def getConfig():
     if not rospy.has_param("num_clients"):
         rospy.set_param("num_clients", "1")
     num_clients = rospy.get_param("num_clients")
-    
+
 class SimpleClient(SDClient):
 
     id_iter = itertools.count()
+
+    @staticmethod
+    def initIdEnumerator():
+        id_iter = itertools.count()
+
+
 
     def __init__(self, address, poll_socket_sleep_time=0.01):
         super().__init__(*address, poll_socket_sleep_time=poll_socket_sleep_time)
