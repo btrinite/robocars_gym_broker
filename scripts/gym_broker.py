@@ -20,6 +20,7 @@ from robocars_msgs.msg import robocars_actuator_output
 from robocars_msgs.msg import robocars_telemetry
 from robocars_msgs.msg import robocars_switch
 from robocars_msgs.msg import robocars_brain_state
+from std_msgs.msg import Int16
 
 image_pub = {}
 telem_pub = {}
@@ -60,6 +61,17 @@ def state_callback(data):
     for c in clients:
         clients[c].set_state(data.state)
 
+def rc_connect_sim_callback(data):
+    if (data.data == 1):
+        pass
+    else:
+        pass
+
+def rc_reset_car_callback(data):
+    if (data.data == 1):
+        for c in clients:
+            clients[c].set_reset_order(2)
+
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
    # name are launched, the previous one is kicked off. The
@@ -73,6 +85,9 @@ def initRosNode():
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback, queue_size=1)
    rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback, queue_size=1)
    rospy.Subscriber("/switch_ctrl/state", robocars_switch, switch_callback, queue_size=1)
+   rospy.Subscriber("/robocars_brain_state", robocars_brain_state, state_callback, queue_size=1)
+   rospy.Subscriber("/remote_control/connect_sim", Int16, rc_connect_sim_callback, queue_size=1)
+   rospy.Subscriber("/remote_control/reset_car", Int16, rc_reset_car_callback, queue_size=1)
    rospy.Subscriber("/robocars_brain_state", robocars_brain_state, state_callback, queue_size=1)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
    telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=1)
