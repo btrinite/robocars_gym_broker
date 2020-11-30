@@ -153,7 +153,7 @@ class SimpleClient(SDClient):
         super().__init__(*address, poll_socket_sleep_time=poll_socket_sleep_time)
         self.last_image = None
         self.car_loaded = False
-        self.id = next(self.id_iter)
+        self.id = next(SimpleClient.id_iter)
         self.state = robocars_brain_state.BRAIN_STATE_IDLE
         self.last_state = -1
         self.throttle = 0
