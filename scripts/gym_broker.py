@@ -265,7 +265,7 @@ class SimpleClient(SDClient):
         rospy.loginfo(msg)
         self.send_now(msg)
         time.sleep(0.2)
-        rospy.loginfo("socket polling timer %s", str(self.poll_socket_sleep_sec))
+        #rospy.loginfo("socket polling timer %s", str(self.poll_socket_sleep_sec))
 
     def send_car_config(self, r=192, g=192, b=192):
         # Car config
@@ -368,6 +368,7 @@ def gym_broker():
 
     initRosNode()
     getConfig()
+    rate = rospy.Rate(40) # ROS Rate at 40Hz
         
     # Send random driving controls
     start = time.time()
@@ -381,6 +382,7 @@ def gym_broker():
                     do_drive = False
             except:
                 pass
+        rate.sleep()
 
     time.sleep(3.0)
     disconnect()
