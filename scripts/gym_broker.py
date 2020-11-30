@@ -361,8 +361,6 @@ def gym_broker():
     initRosNode()
     getConfig()
         
-
-
     # Send random driving controls
     start = time.time()
     do_drive = True
