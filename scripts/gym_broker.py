@@ -36,6 +36,7 @@ _count=0
 num_clients="1"
 carBaseName="GrumpyCar"
 clients = {}
+autoResetOnHit = False
 
 bridge = CvBridge()
 
@@ -109,6 +110,7 @@ def getConfig():
     global camFov
     global num_clients
     global carBaseName
+    global autoResetOnHit
 
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
@@ -148,6 +150,10 @@ def getConfig():
     if not rospy.has_param("~carBaseName"):
         rospy.set_param("~carBaseName", "GrumpyCar")
     carBaseName = rospy.get_param("~carBaseName")
+
+    if not rospy.has_param("~autoResetOnHit"):
+        rospy.set_param("~autoResetOnHit", False)
+    autoResetOnHit = rospy.get_param("~autoResetOnHit")
 
 class SimpleClient(SDClient):
 
@@ -196,6 +202,7 @@ class SimpleClient(SDClient):
     def on_msg_recv(self, json_packet):
         global image_pub
         global telem_pub
+        global autoResetOnHit
         if (json_packet["msg_type"] != "telemetry"):
             rospy.loginfo("GYM got message %s", str(json_packet["msg_type"]))
 
@@ -225,7 +232,8 @@ class SimpleClient(SDClient):
         if json_packet['msg_type'] == "telemetry":
             if json_packet["hit"] != "none":
                 rospy.loginfo("Hit "+str(json_packet["hit"]))
-                #self.send_reset_car()
+                if (autoResetOnHit) :
+                    self.send_reset_car()
             imgString = json_packet["image"]
             imgRaw = base64.b64decode(imgString)
             img = np.frombuffer(imgRaw, dtype='uint8')
