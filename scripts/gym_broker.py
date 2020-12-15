@@ -114,33 +114,33 @@ def getConfig():
         rospy.set_param("sceneName", "roboracingleague_1")
     sceneName = rospy.get_param("sceneName")
 
-    if not rospy.has_param("camOffsetX"):
-        rospy.set_param("camOffsetX", "0")
-    camOffsetX = rospy.get_param("camOffsetX")
+    if not rospy.has_param("~camOffsetX"):
+        rospy.set_param("~camOffsetX", "0")
+    camOffsetX = rospy.get_param("~camOffsetX")
 
-    if not rospy.has_param("camOffsetY"):
-        rospy.set_param("camOffsetY", "1")
-    camOffsetY = rospy.get_param("camOffsetY")
+    if not rospy.has_param("~camOffsetY"):
+        rospy.set_param("~camOffsetY", "1")
+    camOffsetY = rospy.get_param("~camOffsetY")
 
-    if not rospy.has_param("camOffsetZ"):
-        rospy.set_param("camOffsetZ", "3")
-    camOffsetZ = rospy.get_param("camOffsetZ")
+    if not rospy.has_param("~camOffsetZ"):
+        rospy.set_param("~camOffsetZ", "3")
+    camOffsetZ = rospy.get_param("~camOffsetZ")
 
-    if not rospy.has_param("camRotX"):
-        rospy.set_param("camRotX", "75")
-    camRotX = rospy.get_param("camRotX")
+    if not rospy.has_param("~camRotX"):
+        rospy.set_param("~camRotX", "75")
+    camRotX = rospy.get_param("~camRotX")
 
-    if not rospy.has_param("camFov"):
-        rospy.set_param("camFov", "150")
-    camFov = rospy.get_param("camFov")
+    if not rospy.has_param("~camFov"):
+        rospy.set_param("~camFov", "150")
+    camFov = rospy.get_param("~camFov")
 
-    if not rospy.has_param("num_clients"):
-        rospy.set_param("num_clients", "1")
-    num_clients = rospy.get_param("num_clients")
+    if not rospy.has_param("~num_clients"):
+        rospy.set_param("~num_clients", "1")
+    num_clients = rospy.get_param("~num_clients")
 
-    if not rospy.has_param("carBaseName"):
-        rospy.set_param("carBaseName", "GrumpyCar")
-    num_clients = rospy.get_param("carBaseName")
+    if not rospy.has_param("~carBaseName"):
+        rospy.set_param("~carBaseName", "GrumpyCar")
+    num_clients = rospy.get_param("~carBaseName")
 
 class SimpleClient(SDClient):
 
