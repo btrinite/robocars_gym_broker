@@ -159,6 +159,7 @@ class SimpleClient(SDClient):
         SimpleClient.id_iter = itertools.count(0)
 
     def __init__(self, address, poll_socket_sleep_time=0.01):
+        global num_clients
         super().__init__(*address, poll_socket_sleep_time=poll_socket_sleep_time)
         self.last_image = None
         self.car_loaded = False
@@ -170,8 +171,8 @@ class SimpleClient(SDClient):
         self.braking = 0
         self.reset_order = 0
         self.last_reset_order = 0
-        self.image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
-        self.telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=1)
+        self.image_pub = rospy.Publisher("/gym/image", Image, queue_size=num_clients)
+        self.telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=num_clients)
 
     def getId(self):
         return self.id
