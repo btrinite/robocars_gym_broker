@@ -22,8 +22,6 @@ from robocars_msgs.msg import robocars_switch
 from robocars_msgs.msg import robocars_brain_state
 from std_msgs.msg import Int16
 
-image_pub = {}
-telem_pub = {}
 hostSimulator="localhost"
 hostPort=9091
 sceneName=""
@@ -85,8 +83,6 @@ def initRosNode():
    # anonymous=True flag means that rospy will choose a unique
    # name for our 'listener' node so that multiple listeners can
    # run simultaneously.
-   global image_pub
-   global telem_pub
    rospy.init_node('gym_broker', anonymous=False)
    rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback, queue_size=1)
    rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback, queue_size=1)
@@ -96,8 +92,6 @@ def initRosNode():
    rospy.Subscriber("/remote_control/connect_sim", Int16, rc_connect_sim_callback, queue_size=1)
    rospy.Subscriber("/remote_control/reset_car", Int16, rc_reset_car_callback, queue_size=1)
    rospy.Subscriber("/remote_control/num_car", Int16, rc_num_car_callback, queue_size=1)
-   image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
-   telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=1)
    
 def getConfig():
     global hostSimulator
@@ -176,6 +170,8 @@ class SimpleClient(SDClient):
         self.braking = 0
         self.reset_order = 0
         self.last_reset_order = 0
+        self.image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
+        self.telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=1)
 
     def getId(self):
         return self.id
@@ -200,8 +196,6 @@ class SimpleClient(SDClient):
         self.state=state
 
     def on_msg_recv(self, json_packet):
-        global image_pub
-        global telem_pub
         global autoResetOnHit
         if (json_packet["msg_type"] != "telemetry"):
             rospy.loginfo("GYM got message %s", str(json_packet["msg_type"]))
