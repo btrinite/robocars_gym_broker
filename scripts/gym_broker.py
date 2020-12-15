@@ -76,7 +76,7 @@ def rc_reset_car_callback(data):
 def rc_num_car_callback(data):
     global num_clients
     num_clients = data.data
-    
+
 
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
@@ -285,7 +285,7 @@ class SimpleClient(SDClient):
         # Car config
         # body_style = "donkey" | "bare" | "car01" choice of string
         # body_rgb  = (128, 128, 128) tuple of ints
-        if num_clients > 1:
+        if int(num_clients) > 1:
             car_name = carBaseName+str(self.id)
         else:
             car_name = carBaseName
