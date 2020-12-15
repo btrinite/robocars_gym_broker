@@ -102,7 +102,8 @@ def getConfig():
     global camRotX
     global camFov
     global num_clients
-
+    global carBaseName
+    
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
     hostSimulator = rospy.get_param("simulatorHost")
@@ -140,7 +141,7 @@ def getConfig():
 
     if not rospy.has_param("~carBaseName"):
         rospy.set_param("~carBaseName", "GrumpyCar")
-    num_clients = rospy.get_param("~carBaseName")
+    carBaseName = rospy.get_param("~carBaseName")
 
 class SimpleClient(SDClient):
 
