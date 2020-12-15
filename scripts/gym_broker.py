@@ -73,6 +73,11 @@ def rc_reset_car_callback(data):
     for c in clients:
         clients[c].set_reset_order(data.data)
 
+def rc_num_car_callback(data):
+    global num_clients
+    num_clients = data.data
+    
+
 def initRosNode():
    # In ROS, nodes are uniquely named. If two nodes with the same
    # name are launched, the previous one is kicked off. The
@@ -89,6 +94,7 @@ def initRosNode():
    rospy.Subscriber("/robocars_brain_state", robocars_brain_state, state_callback, queue_size=1)
    rospy.Subscriber("/remote_control/connect_sim", Int16, rc_connect_sim_callback, queue_size=1)
    rospy.Subscriber("/remote_control/reset_car", Int16, rc_reset_car_callback, queue_size=1)
+   rospy.Subscriber("/remote_control/num_car", Int16, rc_num_car_callback, queue_size=1)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
    telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=1)
    
@@ -103,7 +109,7 @@ def getConfig():
     global camFov
     global num_clients
     global carBaseName
-    
+
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
     hostSimulator = rospy.get_param("simulatorHost")
@@ -275,10 +281,14 @@ class SimpleClient(SDClient):
 
     def send_car_config(self, r=192, g=192, b=192):
         global carBaseName
+        global num_clients
         # Car config
         # body_style = "donkey" | "bare" | "car01" choice of string
         # body_rgb  = (128, 128, 128) tuple of ints
-        car_name = carBaseName+str(self.id)
+        if num_clients > 1:
+            car_name = carBaseName+str(self.id)
+        else:
+            car_name = carBaseName
 
         msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "%s", "body_g" : "%s", "body_b" : "%s", "car_name" : "%s", "font_size" : "20" }' % (r, g, b, car_name)
         self.send_now(msg)
