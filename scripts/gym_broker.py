@@ -34,6 +34,7 @@ camRotX=""
 camFov=""
 _count=0
 num_clients="1"
+carBaseName="GrumpyCar"
 clients = {}
 
 bridge = CvBridge()
@@ -136,6 +137,10 @@ def getConfig():
     if not rospy.has_param("num_clients"):
         rospy.set_param("num_clients", "1")
     num_clients = rospy.get_param("num_clients")
+
+    if not rospy.has_param("carBaseName"):
+        rospy.set_param("carBaseName", "GrumpyCar")
+    num_clients = rospy.get_param("carBaseName")
 
 class SimpleClient(SDClient):
 
@@ -268,10 +273,11 @@ class SimpleClient(SDClient):
         #rospy.loginfo("socket polling timer %s", str(self.poll_socket_sleep_sec))
 
     def send_car_config(self, r=192, g=192, b=192):
+        global carBaseName
         # Car config
         # body_style = "donkey" | "bare" | "car01" choice of string
         # body_rgb  = (128, 128, 128) tuple of ints
-        car_name = "GrumpyCar"+str(self.id)
+        car_name = carBaseName+str(self.id)
 
         msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "%s", "body_g" : "%s", "body_b" : "%s", "car_name" : "%s", "font_size" : "20" }' % (r, g, b, car_name)
         self.send_now(msg)
