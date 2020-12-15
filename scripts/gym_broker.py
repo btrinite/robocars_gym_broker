@@ -88,7 +88,6 @@ def initRosNode():
    rospy.Subscriber("/robocars_brain_state", robocars_brain_state, state_callback, queue_size=1)
    rospy.Subscriber("/remote_control/connect_sim", Int16, rc_connect_sim_callback, queue_size=1)
    rospy.Subscriber("/remote_control/reset_car", Int16, rc_reset_car_callback, queue_size=1)
-   rospy.Subscriber("/robocars_brain_state", robocars_brain_state, state_callback, queue_size=1)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=1)
    telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=1)
    
