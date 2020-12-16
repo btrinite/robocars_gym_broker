@@ -83,9 +83,9 @@ def rc_num_car_callback(data):
 
 
 def initRosNode():
-    global image_pub
-    global telem_pub
-    global num_clients
+   global image_pub
+   global telem_pub
+   global num_clients
    # In ROS, nodes are uniquely named. If two nodes with the same
    # name are launched, the previous one is kicked off. The
    # anonymous=True flag means that rospy will choose a unique
