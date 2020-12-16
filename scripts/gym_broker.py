@@ -313,6 +313,8 @@ class SimpleClient(SDClient):
             car_name = carBaseName
 
         msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "%s", "body_g" : "%s", "body_b" : "%s", "car_name" : "%s", "font_size" : "20" }' % (r, g, b, car_name)
+        rospy.loginfo("Car config")
+        rospy.loginfo(msg)
         self.send_now(msg)
 
         #this sleep gives the car time to spawn. Once it's spawned, it's ready for the camera config.
