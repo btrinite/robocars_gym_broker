@@ -180,9 +180,10 @@ class SimpleClient(SDClient):
     def __init__(self, address, poll_socket_sleep_time=0.01):
         global num_clients
         super().__init__(*address, poll_socket_sleep_time=poll_socket_sleep_time)
+        self.id = next(SimpleClient.id_iter)
+        rospy.loginfo("Init car %s", str(self.id))
         self.last_image = None
         self.car_loaded = False
-        self.id = next(SimpleClient.id_iter)
         self.state = robocars_brain_state.BRAIN_STATE_IDLE
         self.last_state = -1
         self.throttle = 0
