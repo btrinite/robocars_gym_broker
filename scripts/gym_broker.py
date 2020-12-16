@@ -34,6 +34,8 @@ _count=0
 num_clients="1"
 carBaseName="GrumpyCar"
 clients = {}
+image_pub = {}
+telem_pub = {}
 autoResetOnHit = False
 carBodyR = 0
 carBodyG = 0
@@ -81,6 +83,9 @@ def rc_num_car_callback(data):
 
 
 def initRosNode():
+    global image_pub
+    global telem_pub
+    global num_clients
    # In ROS, nodes are uniquely named. If two nodes with the same
    # name are launched, the previous one is kicked off. The
    # anonymous=True flag means that rospy will choose a unique
@@ -95,6 +100,9 @@ def initRosNode():
    rospy.Subscriber("/remote_control/connect_sim", Int16, rc_connect_sim_callback, queue_size=1)
    rospy.Subscriber("/remote_control/reset_car", Int16, rc_reset_car_callback, queue_size=1)
    rospy.Subscriber("/remote_control/num_car", Int16, rc_num_car_callback, queue_size=1)
+   image_pub = rospy.Publisher("/gym/image", Image, queue_size=int(num_clients))
+   telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=int(num_clients))
+
    
 def getConfig():
     global hostSimulator
@@ -191,8 +199,6 @@ class SimpleClient(SDClient):
         self.braking = 0
         self.reset_order = 0
         self.last_reset_order = 0
-        self.image_pub = rospy.Publisher("/gym/image", Image, queue_size=num_clients)
-        self.telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=num_clients)
 
     def getId(self):
         return self.id
@@ -218,6 +224,8 @@ class SimpleClient(SDClient):
 
     def on_msg_recv(self, json_packet):
         global autoResetOnHit
+        global image_pub
+        global telem_pub
         if (json_packet["msg_type"] != "telemetry"):
             rospy.loginfo("GYM got message %s", str(json_packet["msg_type"]))
 
@@ -256,14 +264,14 @@ class SimpleClient(SDClient):
             blured_img = cv2.medianBlur(cv_image, 5)
             image_message = bridge.cv2_to_imgmsg(blured_img, encoding="bgr8")
             image_message.header.frame_id=str(self.id)
-            if self.image_pub:
-                self.image_pub.publish(image_message)
+            if image_pub:
+                image_pub.publish(image_message)
             telem_msg = robocars_telemetry()
             telem_msg.speed = json_packet["speed"]/20.0
             telem_msg.cte = json_packet["cte"]
             telem_msg.header.frame_id=str(self.id)
-            if self.telem_pub:
-                self.telem_pub.publish(telem_msg)
+            if telem_pub:
+                telem_pub.publish(telem_msg)
 
 
         #print("got:", json_packet)
