@@ -35,6 +35,9 @@ num_clients="1"
 carBaseName="GrumpyCar"
 clients = {}
 autoResetOnHit = False
+carBodyR = 0
+carBodyG = 0
+carBodyB = 0 
 
 bridge = CvBridge()
 
@@ -105,6 +108,10 @@ def getConfig():
     global num_clients
     global carBaseName
     global autoResetOnHit
+    global carBodyR
+    global carBodyG
+    global carBodyB
+
 
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
@@ -148,6 +155,18 @@ def getConfig():
     if not rospy.has_param("~autoResetOnHit"):
         rospy.set_param("~autoResetOnHit", False)
     autoResetOnHit = rospy.get_param("~autoResetOnHit")
+
+    if not rospy.has_param("~carBodyR"):
+        rospy.set_param("~carBodyR", False)
+    carBodyR = rospy.get_param("~carBodyR")
+
+    if not rospy.has_param("~carBodyG"):
+        rospy.set_param("~carBodyG", False)
+    carBodyG = rospy.get_param("~carBodyG")
+
+    if not rospy.has_param("~carBodyB"):
+        rospy.set_param("~carBodyB", False)
+    carBodyB = rospy.get_param("~carBodyB")
 
 class SimpleClient(SDClient):
 
@@ -336,6 +355,10 @@ class SimpleClient(SDClient):
     def update(self):
         # just random steering now
 
+        global carBodyB
+        global carBodyG
+        global carBodyR
+
         st = self.steering
         th = self.throttle
         brk = self.braking
@@ -354,7 +377,7 @@ class SimpleClient(SDClient):
             if (self.state == robocars_brain_state.BRAIN_STATE_MANUAL_DRIVING):
                 self.send_car_config(255,0,0)
             if (self.state == robocars_brain_state.BRAIN_STATE_AUTONOMOUS_DRIVING):
-                self.send_car_config(0,0,255)
+                self.send_car_config(carBodyR,carBodyG,carBodyB)
         self.send_controls(st, th, brk)
 
 def connect():
