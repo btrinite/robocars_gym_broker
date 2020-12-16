@@ -308,7 +308,7 @@ class SimpleClient(SDClient):
         # body_style = "donkey" | "bare" | "car01" choice of string
         # body_rgb  = (128, 128, 128) tuple of ints
         if int(num_clients) > 1:
-            car_name = carBaseName+str(self.id)
+            car_name = carBaseName+" "+str(self.id)
         else:
             car_name = carBaseName
 
