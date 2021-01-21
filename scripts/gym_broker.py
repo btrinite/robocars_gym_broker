@@ -321,7 +321,7 @@ class SimpleClient(SDClient):
         else:
             car_name = carBaseName
 
-        msg = '{ "msg_type" : "car_config", "body_style" : "car01", "body_r" : "%s", "body_g" : "%s", "body_b" : "%s", "car_name" : "%s", "font_size" : "20" }' % (r, g, b, car_name)
+        msg = '{ "msg_type" : "car_config", "body_style" : "donkey", "body_r" : "%s", "body_g" : "%s", "body_b" : "%s", "car_name" : "%s", "font_size" : "20" }' % (r, g, b, car_name)
         rospy.loginfo("Car config")
         rospy.loginfo(msg)
         self.send_now(msg)
