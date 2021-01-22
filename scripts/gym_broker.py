@@ -262,7 +262,10 @@ class SimpleClient(SDClient):
             img = np.frombuffer(imgRaw, dtype='uint8')
             cv_image = cv2.imdecode(img,cv2.IMREAD_COLOR)
             blured_img = cv2.medianBlur(cv_image, 5)
-            image_message = bridge.cv2_to_imgmsg(blured_img, encoding="bgr8")
+            yuv_img = cv2.cvtColor(blured_img, cv2.COLOR_BGR2YUV)
+            yuv_img[:,:,0] = cv2.equalizeHist(yuv_img[:,:,0])
+            hist_img = cv2.cvtColor(yuv_img, cv2.COLOR_YUV2BGR)
+            image_message = bridge.cv2_to_imgmsg(hist_img, encoding="bgr8")
             image_message.header.frame_id=str(self.id)
             if image_pub:
                 image_pub.publish(image_message)
