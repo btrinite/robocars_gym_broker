@@ -40,6 +40,7 @@ autoResetOnHit = False
 carBodyR = 0
 carBodyG = 0
 carBodyB = 0 
+brakeOnReverse = False
 
 bridge = CvBridge()
 
@@ -119,6 +120,7 @@ def getConfig():
     global carBodyR
     global carBodyG
     global carBodyB
+    global brakeOnReverse
 
 
     if not rospy.has_param("simulatorHost"):
@@ -175,6 +177,10 @@ def getConfig():
     if not rospy.has_param("~carBodyB"):
         rospy.set_param("~carBodyB", False)
     carBodyB = rospy.get_param("~carBodyB")
+
+    if not rospy.has_param("~brakeOnReverse"):
+        rospy.set_param("~brakeOnReverse", False)
+    carBodyB = rospy.get_param("~brakeOnReverse")
 
 class SimpleClient(SDClient):
 
@@ -354,6 +360,11 @@ class SimpleClient(SDClient):
         
 
     def send_controls(self, steering, throttle, brake):
+        if brakeOnReverse:
+            if throttle<0:
+                brake=-throttle
+            else:
+                brake=0
         global _count
         _count=_count+1
         msg = { "msg_type" : "control",
