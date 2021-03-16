@@ -363,6 +363,7 @@ class SimpleClient(SDClient):
         if brakeOnReverse:
             if throttle<0:
                 brake=-throttle
+                throttle=0
             else:
                 brake=0
         global _count
