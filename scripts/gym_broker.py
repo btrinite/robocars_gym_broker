@@ -41,6 +41,7 @@ carBodyR = 0
 carBodyG = 0
 carBodyB = 0 
 brakeOnReverse = False
+blur_image = True
 
 bridge = CvBridge()
 
@@ -121,6 +122,7 @@ def getConfig():
     global carBodyG
     global carBodyB
     global brakeOnReverse
+    global blur_image
 
 
     if not rospy.has_param("simulatorHost"):
@@ -180,7 +182,11 @@ def getConfig():
 
     if not rospy.has_param("~brakeOnReverse"):
         rospy.set_param("~brakeOnReverse", False)
-    carBodyB = rospy.get_param("~brakeOnReverse")
+    brakeOnReverse = rospy.get_param("~brakeOnReverse")
+
+    if not rospy.has_param("~blurImage"):
+        rospy.set_param("~blurImage", True)
+    blur_image = rospy.get_param("~blurImage")
 
 class SimpleClient(SDClient):
 
@@ -232,6 +238,7 @@ class SimpleClient(SDClient):
         global autoResetOnHit
         global image_pub
         global telem_pub
+        global blur_image
         if (json_packet["msg_type"] != "telemetry"):
             rospy.loginfo("GYM got message %s", str(json_packet["msg_type"]))
 
@@ -267,11 +274,15 @@ class SimpleClient(SDClient):
             imgRaw = base64.b64decode(imgString)
             img = np.frombuffer(imgRaw, dtype='uint8')
             cv_image = cv2.imdecode(img,cv2.IMREAD_COLOR)
-            #blured_img = cv2.medianBlur(cv_image, 5)
+            if blur_image:
+                blured_img = cv2.medianBlur(cv_image, 5)
+                image_message = bridge.cv2_to_imgmsg(blured_img, encoding="bgr8")
+            else:
+                image_message = bridge.cv2_to_imgmsg(cv_image, encoding="bgr8")
+
             #yuv_img = cv2.cvtColor(blured_img, cv2.COLOR_BGR2YUV)
             #yuv_img[:,:,0] = cv2.equalizeHist(yuv_img[:,:,0])
             #hist_img = cv2.cvtColor(yuv_img, cv2.COLOR_YUV2BGR)
-            image_message = bridge.cv2_to_imgmsg(cv_image, encoding="bgr8")
             image_message.header.frame_id=str(self.id)
             if image_pub:
                 image_pub.publish(image_message)
