@@ -253,7 +253,8 @@ class SimpleClient(SDClient):
             rospy.loginfo("car_loaded event received")
             self.car_loaded = True
             self.send_car_config()
-            self.send_cam_config()
+            if override_cam_config:
+                self.send_cam_config()
 
         if json_packet['msg_type'] == "protocol_version":
             rospy.loginfo("GYM Protocol Version %s", str(json_packet["version"]))
