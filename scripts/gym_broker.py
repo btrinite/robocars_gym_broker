@@ -42,6 +42,7 @@ carBodyG = 0
 carBodyB = 0 
 brakeOnReverse = False
 blur_image = True
+override_cam_config = False
 
 bridge = CvBridge()
 
@@ -123,7 +124,7 @@ def getConfig():
     global carBodyB
     global brakeOnReverse
     global blur_image
-
+    global override_cam_config
 
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
@@ -185,8 +186,12 @@ def getConfig():
     brakeOnReverse = rospy.get_param("~brakeOnReverse")
 
     if not rospy.has_param("~blurImage"):
-        rospy.set_param("~blurImage", True)
+        rospy.set_param("~blurImage", False)
     blur_image = rospy.get_param("~blurImage")
+
+    if not rospy.has_param("~overrideCamConfig"):
+        rospy.set_param("~overrideCamConfig", False)
+    override_cam_config = rospy.get_param("~overrideCamConfig")
 
 class SimpleClient(SDClient):
 
@@ -239,6 +244,8 @@ class SimpleClient(SDClient):
         global image_pub
         global telem_pub
         global blur_image
+        global override_cam_config
+
         if (json_packet["msg_type"] != "telemetry"):
             rospy.loginfo("GYM got message %s", str(json_packet["msg_type"]))
 
