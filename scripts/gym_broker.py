@@ -95,9 +95,9 @@ def initRosNode():
    # name for our 'listener' node so that multiple listeners can
    # run simultaneously.
    rospy.init_node('gym_broker', anonymous=False)
-   rospy.Subscriber("/throttling_ctrl/output", robocars_actuator_output, throttling_callback, queue_size=1)
-   rospy.Subscriber("/steering_ctrl/output", robocars_actuator_output, steering_callback, queue_size=1)
-   rospy.Subscriber("/braking_ctrl/output", robocars_actuator_output, braking_callback, queue_size=1)
+   rospy.Subscriber("/throttling_ctrl/full", robocars_actuator_output, throttling_callback, queue_size=1)
+   rospy.Subscriber("/steering_ctrl/full", robocars_actuator_output, steering_callback, queue_size=1)
+   rospy.Subscriber("/braking_ctrl/full", robocars_actuator_output, braking_callback, queue_size=1)
    rospy.Subscriber("/switch_ctrl/state", robocars_switch, switch_callback, queue_size=1)
    rospy.Subscriber("/robocars_brain_state", robocars_brain_state, state_callback, queue_size=1)
    rospy.Subscriber("/remote_control/connect_sim", Int16, rc_connect_sim_callback, queue_size=1)
