@@ -43,6 +43,7 @@ carBodyB = 0
 brakeOnReverse = False
 blur_image = True
 override_cam_config = False
+reset_on_ch1 = False
 
 bridge = CvBridge()
 
@@ -62,8 +63,11 @@ def braking_callback(data):
        clients[data.header.frame_id].set_braking(-data.norm)
 
 def switch_callback(data):
-    for c in clients:
-        clients[c].set_reset_order(data.switchs[1])
+    global reset_on_ch1
+
+    if reset_on_ch1:
+        for c in clients:
+            clients[c].set_reset_order(data.switchs[1])
 
 def state_callback(data):
     for c in clients:
@@ -125,6 +129,7 @@ def getConfig():
     global brakeOnReverse
     global blur_image
     global override_cam_config
+    global reset_on_ch1
 
     if not rospy.has_param("simulatorHost"):
         rospy.set_param("simulatorHost", "localhost")
@@ -192,6 +197,10 @@ def getConfig():
     if not rospy.has_param("~overrideCamConfig"):
         rospy.set_param("~overrideCamConfig", False)
     override_cam_config = rospy.get_param("~overrideCamConfig")
+
+    if not rospy.has_param("~resetOnCh1"):
+        rospy.set_param("~resetOnCh1", False)
+    reset_on_ch1 = rospy.get_param("~resetOnCh1")
 
 class SimpleClient(SDClient):
 
