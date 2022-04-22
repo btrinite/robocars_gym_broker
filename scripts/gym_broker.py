@@ -316,6 +316,7 @@ class SimpleClient(SDClient):
                 image_pub.publish(image_message)
             if info_pub:
                 self.camera_info_msg.header.frame_id = image_message.header.frame_id
+                self.camera_info_msg.header.stamp = image_message.header.stamp
                 info_pub.publish(self.camera_info_msg)
             telem_msg = robocars_telemetry()
             telem_msg.speed = json_packet["speed"]/20.0
