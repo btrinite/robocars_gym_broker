@@ -21,6 +21,7 @@ from robocars_msgs.msg import robocars_telemetry
 from robocars_msgs.msg import robocars_switch
 from robocars_msgs.msg import robocars_brain_state
 from std_msgs.msg import Int16
+from sensor_msgs.msg import CameraInfo
 
 hostSimulator="localhost"
 hostPort=9091
@@ -36,6 +37,7 @@ carBaseName="GrumpyCar"
 clients = {}
 image_pub = {}
 telem_pub = {}
+info_pub = {}
 autoResetOnHit = False
 carBodyR = 0
 carBodyG = 0
@@ -92,6 +94,7 @@ def rc_num_car_callback(data):
 def initRosNode():
    global image_pub
    global telem_pub
+   global info_pub
    global num_clients
    # In ROS, nodes are uniquely named. If two nodes with the same
    # name are launched, the previous one is kicked off. The
@@ -109,6 +112,7 @@ def initRosNode():
    rospy.Subscriber("/remote_control/num_car", Int16, rc_num_car_callback, queue_size=1)
    image_pub = rospy.Publisher("/gym/image", Image, queue_size=int(num_clients))
    telem_pub = rospy.Publisher('/gym/telemetry', robocars_telemetry, queue_size=int(num_clients))
+   info_pub = rospy.Publisher("/gym/camera_info", CameraInfo, queue_size=10)
 
    
 def getConfig():
@@ -202,6 +206,12 @@ def getConfig():
         rospy.set_param("~resetOnCh1", False)
     reset_on_ch1 = rospy.get_param("~resetOnCh1")
 
+def build_CameraInfo():
+    camera_info_msg = CameraInfo()
+    camera_info_msg.width = 160
+    camera_info_msg.height = 120
+    return camera_info_msg
+
 class SimpleClient(SDClient):
 
     id_iter = itertools.count(0)
@@ -225,6 +235,7 @@ class SimpleClient(SDClient):
         self.braking = 0
         self.reset_order = 0
         self.last_reset_order = 0
+        self.camera_info_msg = build_CameraInfo()
 
     def getId(self):
         return self.id
@@ -303,6 +314,8 @@ class SimpleClient(SDClient):
             image_message.header.frame_id=str(self.id)
             if image_pub:
                 image_pub.publish(image_message)
+            if info_pub:
+                info_pub.publish(self.camera_info_msg)
             telem_msg = robocars_telemetry()
             telem_msg.speed = json_packet["speed"]/20.0
             telem_msg.cte = json_packet["cte"]
