@@ -312,6 +312,7 @@ class SimpleClient(SDClient):
             #yuv_img[:,:,0] = cv2.equalizeHist(yuv_img[:,:,0])
             #hist_img = cv2.cvtColor(yuv_img, cv2.COLOR_YUV2BGR)
             image_message.header.frame_id=str(self.id)
+            image_message.header.stamp = rospy.Time.now()
             if image_pub:
                 image_pub.publish(image_message)
             if info_pub:
